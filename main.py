@@ -19,10 +19,17 @@ def get_fact():
 
 @app.route('/')
 def home():
-    return "FILL ME!"
+    # URL for pig latinizer
+    url = 'https://hidden-journey-62459.herokuapp.com/piglatinize/'
+    # Get a random fact from the fact website
+    fact = get_fact()
+    # Submit post request to pig latinizer
+    response = requests.post(url, {'input_text': fact}, allow_redirects=False)
+    # Retrieve redirect url
+    redirect = response.headers['Location']
+    return redirect
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 6787))
     app.run(host='0.0.0.0', port=port)
-
