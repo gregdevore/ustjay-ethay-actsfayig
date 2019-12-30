@@ -1,7 +1,7 @@
 import os
 
 import requests
-from flask import Flask, send_file, Response
+from flask import Flask, send_file, Response, render_template
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
@@ -27,7 +27,16 @@ def home():
     response = requests.post(url, {'input_text': fact}, allow_redirects=False)
     # Retrieve redirect url
     redirect = response.headers['Location']
-    return redirect
+    # Get translation from redirect URL
+    response = requests.get(redirect)
+    # Use BeautifulSoup to get translated fact
+    soup = BeautifulSoup(response.content, 'html.parser')
+    body = soup.find('body').getText().strip()
+    # Reponse body always starts with the following text, translation follows
+    helper_string = 'Pig Latin\nEsultray\n\t\n'
+    translation = body[len(helper_string):].strip()
+    # Render page
+    return render_template('translation.jinja2', input=fact, output=translation, url=redirect)
 
 
 if __name__ == "__main__":
